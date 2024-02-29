@@ -1,0 +1,77 @@
+@startuml
+
+skinparam groupInheritance 2
+'https://plantuml.com/class-diagram
+class Team {
+    - id : Long
+    ..
+    - name : String
+    - manager : String
+    - leavePolicy : int
+    - memberCount : int
+    --
+    + increaseMemberCount() : void
+    + decreaseMemberCount() : void
+}
+
+class Member {
+    - id : Long
+    ..
+    - team : Team
+    ..
+    - name : String
+    - role : Role
+    - birthday : LocalDate
+    - workStartDate : LocalDate
+    - leave : Leave
+    --
+    + usingLeave() : void
+}
+
+class Leave <<Value Type>> {
+    - remainingDays : int
+    --
+    + increaseRemainingDays() : void
+    + decreaseRemainingDays() : void
+}
+
+abstract class AttendanceStatus {
+    - id : Long
+    ..
+    - member : Member
+    ..
+    - attendanceDate : LocalDate
+}
+
+class LeaveRecord extends AttendanceStatus {
+    - reason : String
+}
+
+class WorkRecord extends AttendanceStatus {
+    - startTime : LocalTime
+    - endTime : LocalTime
+    - workTime : WorkTime
+    --
+    + recordStartTime() : WorkRecord
+    + recordEndTime() : WorkRecord
+    ..
+    + getWorkingMinute() : Long
+}
+
+enum Role {
+    MANAGER
+    MEMBER
+}
+
+class WorkTime <<Value Type>> {
+    - workTime : Long
+    --
+    + getWorkingMinute() : Long
+    ..
+    + greaterThan() : boolean
+}
+
+Team -right-  Member
+Member -- AttendanceStatus
+
+@enduml
