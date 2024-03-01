@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity @Getter @Setter
 @Table(name = "EMPLOYEES")
@@ -32,6 +34,9 @@ public class Employee {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DEPARTMENT_IDX")
     private Department department;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Work> works;
 
     @Builder
     public Employee(Long employeeIdx, String name, String role, LocalDate birthday, LocalDate workStartDate, Department department) {

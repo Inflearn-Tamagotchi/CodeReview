@@ -1,6 +1,7 @@
 package com.inflean.miniproject.controller;
 
 import com.inflean.miniproject.dto.request.EmployeeSaveDTO;
+import com.inflean.miniproject.dto.response.AllEmployeesDTO;
 import com.inflean.miniproject.dto.response.SelectAllTeamDTO;
 import com.inflean.miniproject.service.EmployeeService;
 import org.springframework.web.bind.annotation.*;
@@ -25,5 +26,10 @@ public class EmployeeController {
     @GetMapping("/selectAllTeam")
     public List<SelectAllTeamDTO> selectAllTeam(){
         return employeeService.selectAllTeam();
+    }
+
+    @GetMapping("/allEmployees")
+    public List<AllEmployeesDTO> allEmployees(){
+        return employeeService.allEmployees();
     }
 }

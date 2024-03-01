@@ -13,4 +13,5 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
     Department findByTeamName(String teamName);
 
+
 }
