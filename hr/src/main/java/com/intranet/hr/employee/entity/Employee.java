@@ -2,12 +2,14 @@ package com.intranet.hr.employee.entity;
 
 
 import com.intranet.hr.team.entity.Team;
+import com.intranet.hr.work.entity.Work;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table
@@ -36,6 +38,10 @@ public class Employee {
     @ManyToOne
     @JoinColumn(name="team_num")
     private Team team;
+
+    @OneToMany(mappedBy = "employee")
+    private List<Work> works;
+
 
     @Builder
     public Employee(String name, TeamRole role, LocalDate hireDate, LocalDate birth, Team team){
