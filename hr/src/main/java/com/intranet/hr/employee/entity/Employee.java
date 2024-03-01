@@ -3,6 +3,7 @@ package com.intranet.hr.employee.entity;
 
 import com.intranet.hr.team.entity.Team;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,8 +33,17 @@ public class Employee {
     @Column(columnDefinition = "DATE COMMENT '생일'")
     private LocalDate birth;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="team_num")
     private Team team;
+
+    @Builder
+    public Employee(String name, TeamRole role, LocalDate hireDate, LocalDate birth, Team team){
+        this.name = name;
+        this.role = role;
+        this.hireDate = hireDate;
+        this.birth = birth;
+        this.team = team;
+    }
 
 }
