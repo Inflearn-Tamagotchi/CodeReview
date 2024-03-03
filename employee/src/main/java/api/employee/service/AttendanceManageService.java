@@ -1,0 +1,85 @@
+package api.employee.service;
+
+import api.employee.domain.AttendanceStatus;
+import api.employee.domain.Member;
+import api.employee.domain.Team;
+import api.employee.model.WorkRecordResponse;
+import api.employee.service.domain.MemberService;
+import api.employee.service.domain.AttendanceStatusService;
+import api.employee.visitor.AttendanceVisitor;
+import api.employee.visitor.Visitor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 직원의 근무 상태와 관련된 정보를 관리합니다.
+ */
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class AttendanceManageService {
+
+    private final MemberService memberService;
+    private final AttendanceStatusService attendanceStatusService;
+
+    /**
+     * 직원의 출근 시간을 기록합니다.
+     * @param memberId 대상 직원 ID
+     * @param attendanceDate 기록일
+     * @param startTime 출근 시간
+     */
+    @Transactional
+    public void recordMemberArrivalTime(Long memberId, LocalDate attendanceDate, LocalTime startTime) {
+        Member member = memberService.getMemberReference(memberId);
+        attendanceStatusService.recordArrivalTime(member, attendanceDate, startTime);
+    }
+
+    /**
+     * 요청한 달의 특정 직원의 모든 근무 상태를 찾습니다.
+     * @param memberId 대상 직원 ID
+     * @param month 요청 달
+     * @return 요청 달의 해당 직원의 근무 상태 기록
+     */
+    public WorkRecordResponse memberMonthAttendanceRecord(Long memberId, int month) {
+        List<AttendanceStatus> attendanceStatusList = attendanceStatusService.findAllAttendanceStatus(memberId, month);
+
+        // Visitor 패턴
+        List<WorkRecordResponse.Detail> detail = new ArrayList<>();
+        Visitor visitor = new AttendanceVisitor();
+        // attendanceStatusList 순회하며 Element 별로 로직 처리
+        for (AttendanceStatus attendanceStatus : attendanceStatusList) {
+            detail.add(attendanceStatus.accept(visitor));
+        }
+        return new WorkRecordResponse(detail);
+    }
+
+    /**
+     * 신청일과 팀의 연차 정책을 비교하여 연차 사용 가능 여부를 판단합니다.
+     * 사용 가능하다면, 자신의 남은 연차를 감소시키고 사용합니다.
+     * @param memberId 대상 직원 ID
+     * @param requestLeaveDay 연차 사용일
+     * @param reason 연사 사용 이유
+     */
+    @Transactional
+    public void useLeave(Long memberId, LocalDate requestLeaveDay, String reason) {
+        Member member = memberService.findOneMember(memberId);
+        Team team = member.getTeam();
+
+        // 연차 신청일과 오늘과의 차이 계산
+        int remainingDay = (int) ChronoUnit.DAYS.between(LocalDate.now(), requestLeaveDay);
+
+        // 팀의 연차 정책과 신청일 비교
+        if (!memberService.checkLeavePolicy(team.getId(), remainingDay)) {
+            throw new IllegalArgumentException("The leave request was submitted too late according to the team's leave policy.");
+        }
+        member.usingLeave(); // 연차 사용
+        attendanceStatusService.recordLeave(member, requestLeaveDay, reason); // 연차 기록
+    }
+}
