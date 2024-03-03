@@ -3,7 +3,7 @@ package api.employee.controller;
 import api.employee.model.MemberForm;
 import api.employee.model.MemberResponse;
 import api.employee.model.MemberUpdateForm;
-import api.employee.service.MemberService;
+import api.employee.service.domain.MemberService;
 import api.employee.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,27 +21,27 @@ public class MemberController {
     private final OrganizationService organizationService;
 
     @PostMapping("/member")
-    public void saveMember(MemberForm memberForm) {
+    public void saveMember(@RequestBody MemberForm memberForm) {
         organizationService.joinMember(memberForm);
     }
 
     @GetMapping("/member-list")
     public List<MemberResponse> findAllMember() {
-        return memberService.findAllMember();
+        return memberService.findAllMemberResponse();
     }
 
-    @GetMapping("/member")
-    public MemberResponse findOneMember(Long memberId) {
-        return memberService.findOneMember(memberId);
+    @GetMapping("/member/{memberId}")
+    public MemberResponse findOneMember(@PathVariable(value = "memberId") Long memberId) {
+        return memberService.findOneMemberResponse(memberId);
     }
 
     @PutMapping("/member")
-    public void updateMember(MemberUpdateForm memberUpdateForm) {
+    public void updateMember(@RequestBody MemberUpdateForm memberUpdateForm) {
         organizationService.updateMember(memberUpdateForm);
     }
 
-    @DeleteMapping("/member")
-    public void deleteMember(Long memberId) {
+    @DeleteMapping("/member/{memberId}")
+    public void deleteMember(@PathVariable(value = "memberId") Long memberId) {
         memberService.deleteMember(memberId);
     }
 }

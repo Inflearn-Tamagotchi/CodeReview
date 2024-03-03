@@ -15,12 +15,9 @@ public class MemberUpdateForm {
     private LocalDate birthday;
     private LocalDate workStartDate;
 
-    public void update(Member member) {
+    public void updatePrivacy(Member member) {
         if (!name.isBlank()) {
             member.changeName(name);
-        }
-        if (!role.isBlank()) { // 검증로직이 필요합니다.
-            member.changeRole(Role.valueOf(role.toUpperCase()));
         }
         if (birthday != null) {
             member.changeBirthday(birthday);
@@ -28,5 +25,9 @@ public class MemberUpdateForm {
         if (workStartDate != null) {
             member.changeWorkStartDate(workStartDate);
         }
+    }
+
+    public Role getRole() {
+        return Role.valueOf(role);
     }
 }

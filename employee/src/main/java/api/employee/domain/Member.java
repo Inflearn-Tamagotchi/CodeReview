@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.Assert;
 
 import java.time.LocalDate;
 
@@ -33,6 +34,7 @@ public class Member {
     public static MemberBuilder builder() {
         return new MemberBuilder();
     }
+
     public static class MemberBuilder {
         private String name;
         private Role role;
@@ -83,35 +85,48 @@ public class Member {
     }
 
     // ==== 변경자 ==== //
-    public Member changeTeam(Team team) {
+    public void changeTeam(Team team) {
+        reSignTeam();
+        signTeam(team);
+    }
+
+    public void signTeam(Team team) {
+        this.team = team;
+        this.team.increaseMemberCount();
+    }
+
+    public void reSignTeam() {
         if (this.team != null) {
             this.team.decreaseMemberCount();
         }
-        this.team = team;
-        if (team != null) {
-            this.team.increaseMemberCount();
+        this.team = null;
+    }
+
+    public void changeRole(Role role) {
+        // 역할이 기존과 같으면 return;
+        if (this.role == role) {
+            return;
         }
-        return this;
+        this.role = role; // 역할 부여
+
+        // 변경되는 역할이 멤버면 팀의 매니저를 null로 변경
+        boolean roleCondition = this.role == Role.MEMBER;
+        boolean nameCondition = this.team.getManager().equals(this.name);
+        if (roleCondition && nameCondition) {
+            this.team.changeManager(null);
+        }
     }
 
-    public Member changeRole(Role role) {
-        this.role = role;
-        return this;
-    }
-
-    public Member changeName(String name) {
+    public void changeName(String name) {
         this.name = name;
-        return this;
     }
 
-    public Member changeBirthday(LocalDate birthday) {
+    public void changeBirthday(LocalDate birthday) {
         this.birthday = birthday;
-        return this;
     }
 
-    public Member changeWorkStartDate(LocalDate workStartDate) {
+    public void changeWorkStartDate(LocalDate workStartDate) {
         this.workStartDate = workStartDate;
-        return this;
     }
 
     // ==== 편의 메서드 ==== //
@@ -123,7 +138,12 @@ public class Member {
         return this.role == Role.MANAGER;
     }
 
+    public boolean hasTeam() {
+        return this.team != null;
+    }
+
     public void registerManager() {
+        Assert.isTrue(this.role == Role.MANAGER, "The role must be MANAGER.");
         team.changeManager(this.name);
     }
 }

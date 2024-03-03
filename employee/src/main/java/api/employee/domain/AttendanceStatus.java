@@ -1,5 +1,6 @@
 package api.employee.domain;
 
+import api.employee.visitor.AttendanceElement;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import java.time.LocalDate;
 @Inheritance(strategy = InheritanceType.JOINED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorColumn(name = "record_type")
-public abstract class AttendanceStatus {
+public abstract class AttendanceStatus implements AttendanceElement {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "AttendanceStatus_id")

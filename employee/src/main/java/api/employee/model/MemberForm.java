@@ -23,12 +23,15 @@ public class MemberForm {
         this.workStartDate = workStartDate;
     }
 
+    public Role getRole() {
+        return Role.valueOf(this.role.toUpperCase());
+    }
+
     public Member convertToMember() {
-        Assert.notNull(role, "Role은 필수 값입니다.");
-        Assert.notNull(workStartDate, "workStartDate는 필수 값입니다.");
+        Assert.notNull(role, "Role can't be Null.");
+        Assert.notNull(workStartDate, "WorkStartDate can't be Null.");
         return Member.builder()
                 .name(name)
-                .role(Role.valueOf(this.role.toUpperCase()))
                 .birthday(birthday)
                 .workStartDate(workStartDate)
                 .build();

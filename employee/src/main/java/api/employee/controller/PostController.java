@@ -2,10 +2,10 @@ package api.employee.controller;
 
 import api.employee.model.MemberForm;
 import api.employee.model.TeamForm;
-import api.employee.service.AttendanceStatusService;
+import api.employee.service.AttendanceManageService;
 import api.employee.service.OrganizationService;
-import api.employee.service.TeamService;
-import api.employee.service.WorkTimeRecordService;
+import api.employee.service.domain.TeamService;
+import api.employee.service.domain.AttendanceStatusService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +21,8 @@ public class PostController {
 
     private final TeamService teamService;
     private final OrganizationService organizationService;
+    private final AttendanceManageService attendanceManageService;
     private final AttendanceStatusService attendanceStatusService;
-    private final WorkTimeRecordService workTimeRecordService;
 
     @PostConstruct
     public void setUp() {
@@ -50,10 +50,10 @@ public class PostController {
                         LocalDate.of(2023,2,28));
         organizationService.joinMember(memberForm3);
 
-        attendanceStatusService.recordArrivalTime(1L, LocalDate.of(2024,3,1), LocalTime.of(8, 30, 0));
-        workTimeRecordService.recordDepartureTime(1L, LocalDate.of(2024,3,1), LocalTime.of(18, 0, 0));
+        attendanceManageService.recordMemberArrivalTime(1L, LocalDate.of(2024,3,1), LocalTime.of(8, 30, 0));
+        attendanceStatusService.recordDepartureTime(1L, LocalDate.of(2024,3,1), LocalTime.of(18, 0, 0));
 
-        attendanceStatusService.recordArrivalTime(1L, LocalDate.of(2024,3,2), LocalTime.of(8, 20, 0));
-        workTimeRecordService.recordDepartureTime(1L, LocalDate.of(2024,3,2), LocalTime.of(18, 0, 0));
+        attendanceManageService.recordMemberArrivalTime(1L, LocalDate.of(2024,3,2), LocalTime.of(8, 20, 0));
+        attendanceStatusService.recordDepartureTime(1L, LocalDate.of(2024,3,2), LocalTime.of(18, 0, 0));
     }
 }

@@ -4,6 +4,8 @@ package api.employee.domain.attendanceRecordType;
 import api.employee.domain.AttendanceStatus;
 import api.employee.domain.Member;
 import api.employee.domain.WorkTime;
+import api.employee.model.WorkRecordResponse;
+import api.employee.visitor.Visitor;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -38,7 +40,7 @@ public class WorkRecord extends AttendanceStatus {
     // ==== 변경자 ==== //
     public WorkRecord recordEndTime(LocalTime endTime) {
         if (!this.startTime.isBefore(endTime)) {
-            throw new IllegalArgumentException("퇴근 시간이 출근 시간보다 빠릅니다.");
+            throw new IllegalArgumentException("EndTime must be after StartTime.");
         }
         this.endTime = endTime;
         this.workTime = WorkTime.workRecord(this.startTime, this.endTime);
@@ -48,5 +50,11 @@ public class WorkRecord extends AttendanceStatus {
     // ==== 편의 메서드 ==== //
     public Long getWorkingMinute() {
         return this.workTime.getWorkingMinute();
+    }
+
+    // ===== Visitor ==== //
+    @Override
+    public WorkRecordResponse.Detail accept(Visitor visitor) {
+        return visitor.visitWorkRecord(this);
     }
 }

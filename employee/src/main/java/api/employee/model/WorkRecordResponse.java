@@ -1,9 +1,12 @@
 package api.employee.model;
 
-import api.employee.domain.attendanceRecordType.WorkRecord;
+import api.employee.domain.AttendanceStatus;
+import api.employee.visitor.AttendanceVisitor;
+import api.employee.visitor.Visitor;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -12,23 +15,23 @@ public class WorkRecordResponse {
     private List<Detail> detail;
     private Long sum;
 
-    public WorkRecordResponse(List<WorkRecord> workRecords) {
-        this.detail = workRecords.stream()
-                .map(Detail::new)
-                .toList();
-        this.sum = workRecords.stream()
-                .mapToLong(WorkRecord::getWorkingMinute)
-                .sum();
+    public WorkRecordResponse(List<WorkRecordResponse.Detail> detail) {
+        this.detail = detail;
+        this.sum = detail.stream()
+                        .mapToLong(Detail::getWorkingMinutes)
+                        .sum();
     }
 
     @Getter
     public static class Detail {
         private LocalDate date;
         private Long workingMinutes;
+        private boolean usingDayOff;
 
-        public Detail(WorkRecord workRecord) {
-            this.date = workRecord.getAttendanceDate();
-            this.workingMinutes = workRecord.getWorkingMinute();
+        public Detail(LocalDate date, Long workingMinutes, boolean usingDayOff) {
+            this.date = date;
+            this.workingMinutes = workingMinutes;
+            this.usingDayOff = usingDayOff;
         }
     }
 }

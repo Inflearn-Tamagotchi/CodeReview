@@ -19,10 +19,14 @@ public interface AttendanceStatusRepository extends JpaRepository<AttendanceStat
             "where a.member.id = :memberId " +
             "and a.attendanceDate = :attendanceDate " +
             "and a.endTime is null")
-    Optional<WorkRecord> findUnrecordedData(@Param(value = "memberId") Long memberId, @Param(value = "attendanceDate") LocalDate attendanceDate);
+    Optional<WorkRecord> findUnrecordedData(@Param(value = "memberId") Long memberId,
+                                            @Param(value = "attendanceDate") LocalDate attendanceDate);
 
     @Query("select a " +
             " from AttendanceStatus a " +
-            "where a.member.id = :memberId ")
-    List<WorkRecord> findAllWorkingRecordById(@Param(value = "memberId") Long memberId);
+            "where a.member.id = :memberId " +
+            "  and MONTH(a.attendanceDate) = :month " +
+            "order by a.attendanceDate ASC")
+    Optional<List<AttendanceStatus>> findAllRecordByMember(@Param(value = "memberId") Long memberId,
+                                                           @Param(value = "month") int month);
 }

@@ -26,7 +26,7 @@ public class Leave {
 
     public void decreaseRemainingDays() {
         if (this.remainingDays <= 0) {
-            throw new IllegalArgumentException("연차의 잔여일수가 부족합니다.");
+            throw new IllegalArgumentException("No, more remainingDay.");
         }
         this.remainingDays--;
     }

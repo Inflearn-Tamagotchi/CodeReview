@@ -28,19 +28,16 @@ public class Team {
     }
 
     // ==== 변경자 ==== //
-    public Team changeName(String name) {
+    public void changeName(String name) {
         this.name = name;
-        return this;
     }
 
-    public Team changeManager(String managerName) {
+    public void changeManager(String managerName) {
         this.manager = managerName;
-        return this;
     }
 
-    public Team changeLeavePolicy(Integer leavePolicy) {
+    public void changeLeavePolicy(Integer leavePolicy) {
         this.leavePolicy = leavePolicy;
-        return this;
     }
 
     // ==== 편의 메서드 ==== //

@@ -8,7 +8,7 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 
 /**
- * 근무 시간을 분(Minute)단위로 표기하는 Class
+ * 근무 시간을 분(Minute)단위로 표기하는 Value Type Class
  */
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -34,11 +34,6 @@ public class WorkTime {
         return this.workTime;
     }
 
-    /**
-     * 해당 객체가 매개변수로 들어온 WorkTime보다 크다면 True
-     * @param workTime
-     * @return boolean
-     */
     public boolean greaterThan(WorkTime workTime) {
         return this.workTime > workTime.getWorkingMinute();
     }
