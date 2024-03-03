@@ -1,96 +1,81 @@
 package com.inflean.miniproject.service;
 
-import com.inflean.miniproject.dto.response.WorkTimeMonthDTO;
-import com.inflean.miniproject.entity.Employee;
+import com.inflean.miniproject.dto.response.work.WorkTimeByDateResponseDTO;
 import com.inflean.miniproject.entity.Work;
+import com.inflean.miniproject.enums.State;
 import com.inflean.miniproject.repository.EmployeeRepository;
 import com.inflean.miniproject.repository.WorkRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class WorkService {
+
     private final WorkRepository workRepository;
     private final EmployeeRepository employeeRepository;
 
-    public WorkService(WorkRepository workRepository, EmployeeRepository employeeRepository) {
-        this.workRepository = workRepository;
-        this.employeeRepository = employeeRepository;
-    }
-
-    public void startWork(Long idx) {
-        Optional<Employee> employee = employeeRepository.findById(idx);
+    @Transactional
+    public void toWork(Long employeeId){
         Work work = Work.builder()
-                .state("to work")
-                .time(LocalDateTime.now())
-                .employee(employee.get())
+                .state(State.TO_WORK)
+                .workStartTime(format(LocalDateTime.now()))
+                .employee(employeeRepository.getReferenceById(employeeId))
                 .build();
         workRepository.save(work);
     }
 
-    public void endWork(Long idx){
-        Optional<Employee> employee = employeeRepository.findById(idx);
-        Work work = Work.builder()
-                .state("off work")
-                .time(LocalDateTime.now())
-                .employee(employee.get())
-                .build();
-        workRepository.save(work);
+    @Transactional()
+    public void offWork(Long workId){
+        // 예외처리 및 id값으로 work객체 찾아오기
+        Work work = workRepository.findById(workId)
+                .orElseThrow(() -> new RuntimeException("등록되지 않거나 유효하지 않은 직원입니다."));
+
+        // 업데이트 메소드
+        work.updateWork(State.OFF_WORK, format(LocalDateTime.now()));
     }
 
-    public Map<String, Object> workTimeMonth(Long idx, LocalDateTime month){
-        Optional<Employee> employee = employeeRepository.findById(idx);
-        List<Work> workTimes = workRepository.findByEmployee(employee.get());
-        List<Work> monthWorkTimes = new ArrayList<>();
+    public WorkTimeByDateResponseDTO workTimeByDate(Long employeeId, String selectDate) {
+        List<Work> workList = workRepository.findByEmployee(employeeRepository.getReferenceById(employeeId))
+                .orElseThrow(() -> new RuntimeException("등록되지 않거나 유효하지 않은 직원입니다."));
 
-        for (Work workTime : workTimes){
-            if (format(workTime.getTime()).equals(month)){
-                monthWorkTimes.add(workTime);
-            }
-        }
-
-        List<Work> toWorks = new ArrayList<>();
-        List<Work> offWorks = new ArrayList<>();
-
-        for (Work workTime : monthWorkTimes){
-            if(workTime.getState().equals("to work")){
-                toWorks.add(workTime);
-            }else{
-                offWorks.add(workTime);
-            }
-        }
-
-        Map<String, Object> response = new HashMap<>();
-        List<WorkTimeMonthDTO> dtos = new ArrayList<>();
+        // 빈 객체 생성
+        WorkTimeByDateResponseDTO.Detail detail = new WorkTimeByDateResponseDTO.Detail();
+        List<WorkTimeByDateResponseDTO.Detail> details = new ArrayList<>();
         Long sum = 0L;
 
-        for(int i = 0; i< toWorks.size(); i++){
-            LocalDateTime toWork = toWorks.get(i).getTime();
-            LocalDateTime offWork = offWorks.get(i).getTime();
-            if (format(toWork).equals(format(offWork))){
-                WorkTimeMonthDTO dto = new WorkTimeMonthDTO();
-
-                Duration duration = Duration.between(toWork, offWork);
-                dto.setDate(format(toWork));
-                dto.setWorkMinutes(duration.toMinutes());
-
-                dtos.add(dto);
-                sum += duration.toMinutes();
+        for(int i = 0; i< workList.size(); i++){
+            Long workingTime = workList.get(i).startTimeMinusEndTime();
+            if(formatMonthTime(workList.get(i).getWorkStartTime()).equals(selectDate)){
+                detail.setDate(workList.get(i).getWorkStartTime().split(" ")[0]);
+                detail.setWorkingMinutes(workingTime);
+                details.add(detail);
             }
+            sum += workingTime;
         }
-        response.put("detail", dtos);
-        response.put("sum", sum);
 
-        return response;
+        WorkTimeByDateResponseDTO dto = new WorkTimeByDateResponseDTO();
+        dto.setDetail(details);
+        dto.setSum(sum);
 
+        return dto;
     }
 
-    public String format(LocalDateTime month){
-        return month.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    public String format(LocalDateTime dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return dateTime.format(formatter);
+    }
+
+    public String formatMonthTime(String entityTime) {
+        entityTime = entityTime.substring(0, 7);
+        return entityTime;
     }
 }

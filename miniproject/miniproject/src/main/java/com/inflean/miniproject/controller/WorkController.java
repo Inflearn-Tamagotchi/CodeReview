@@ -1,36 +1,31 @@
 package com.inflean.miniproject.controller;
 
+import com.inflean.miniproject.dto.response.work.WorkTimeByDateResponseDTO;
 import com.inflean.miniproject.service.WorkService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.time.LocalDateTime;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/work")
+@RequiredArgsConstructor
 public class WorkController {
+
     private final WorkService workService;
 
-    public WorkController(WorkService workService) {
-        this.workService = workService;
+    @GetMapping("/to-work/{employeeId}")
+    public void toWork(@PathVariable("employeeId") Long employeeId){
+        workService.toWork(employeeId);
     }
 
-    @GetMapping("/startWork")
-    public void startWork(@RequestParam("employee_idx") Long idx){
-        workService.startWork(idx);
+    @PutMapping("/off-work/{workId}")
+    public void offWork(@PathVariable("workId") Long workId){
+        workService.offWork(workId);
     }
 
-    @GetMapping("/endWork")
-    public void endWork(@RequestParam("employee_idx") Long idx){
-        workService.endWork(idx);
+    @GetMapping("/work-time-by-date/{employeeId}/{selectDate}")
+    public WorkTimeByDateResponseDTO workTimeByDate(@PathVariable("employeeId") Long employeeId,
+                                                    @PathVariable("selectDate") String selectDate){
+        return workService.workTimeByDate(employeeId, selectDate);
     }
 
-    @GetMapping("/workTimeMonth")
-    public Map<String, Object> workTimeMonth(@RequestParam("employee_idx") Long idx,
-                                             @RequestParam("month") LocalDateTime month){
-        return workService.workTimeMonth(idx, month);
-    }
 }

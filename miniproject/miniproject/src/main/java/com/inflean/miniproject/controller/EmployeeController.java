@@ -1,35 +1,27 @@
 package com.inflean.miniproject.controller;
 
-import com.inflean.miniproject.dto.request.EmployeeSaveDTO;
-import com.inflean.miniproject.dto.response.AllEmployeesDTO;
-import com.inflean.miniproject.dto.response.SelectAllTeamDTO;
+import com.inflean.miniproject.dto.request.employee.SaveEmployeeRequestDTO;
+import com.inflean.miniproject.dto.response.employee.SelectAllEmployeeResponseDTO;
 import com.inflean.miniproject.service.EmployeeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/employee")
+@RequiredArgsConstructor
 public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    public EmployeeController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
-    }
-
     @PostMapping("/save")
-    public void saveEmployee(@RequestBody EmployeeSaveDTO request){
+    public void saveEmployee(@RequestBody SaveEmployeeRequestDTO request){
         employeeService.saveEmployee(request);
     }
 
-    @GetMapping("/selectAllTeam")
-    public List<SelectAllTeamDTO> selectAllTeam(){
-        return employeeService.selectAllTeam();
-    }
-
-    @GetMapping("/allEmployees")
-    public List<AllEmployeesDTO> allEmployees(){
-        return employeeService.allEmployees();
+    @GetMapping("/select-all-employee")
+    public List<SelectAllEmployeeResponseDTO> selectAllEmployee(){
+        return employeeService.selectAllEmployee();
     }
 }
