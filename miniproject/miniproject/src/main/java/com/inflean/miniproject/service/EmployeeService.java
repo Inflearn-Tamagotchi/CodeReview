@@ -33,10 +33,10 @@ public class EmployeeService {
                         .orElseThrow(()-> new RuntimeException("해당 팀은 존재하지않습니다")))
                 .build();
 
+        employee.settingEmployeeAnnualLeaveDays(employee.getWorkStartDate());
         employee.teamEmployeeCount();
         employee.judgmentManager(employee.getRole(), employee.getEmployeeName());
 
-        teamRepository.save(employee.getTeam());
         employeeRepository.save(employee);
     }
 
@@ -67,8 +67,10 @@ public class EmployeeService {
     public Role judgmentRole(String role){
         if(role.equals("manager") || role.equals("MANAGER")){
             return Role.MANAGER;
-        }else{
+        }else if(role.equals("member") || role.equals("MEMBER")){
             return Role.MEMBER;
+        }else {
+            throw new IllegalArgumentException("잘못된 회원직급을 입력하셨습니다.");
         }
     }
 }

@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity @Getter
 @Table(name = "EMPLOYEE")
 @NoArgsConstructor
@@ -23,6 +25,8 @@ public class Employee {
     private String birthday;
 
     private String workStartDate;
+
+    private Integer remainingAnnualLeaveDays = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TEAM_ID")
@@ -55,6 +59,32 @@ public class Employee {
      */
     public void teamEmployeeCount(){
         this.team.isCount();
+    }
+
+    /**
+     * 현재 연도와 회원입사 연도를 판별해서 11일과 15일로 세팅하는 메소드
+     * @param workStartDate
+     */
+    public void settingEmployeeAnnualLeaveDays(String workStartDate){
+        // 현재연도
+        String now = LocalDateTime.now().toString().substring(0,4);
+
+        // 직원이 입사한 연도
+        String startDate = workStartDate.substring(0,4);
+
+        if(now.equals(startDate)){
+            this.remainingAnnualLeaveDays = 11;
+        }else {
+            this.remainingAnnualLeaveDays = 15;
+        }
+    }
+
+    /**
+     * 사용한 연차일을 받아서 현재 연차일에서 마이너스해주는 메소드
+     * @param usingAnnual
+     */
+    public void modifyAnnualLeave(Integer usingAnnual){
+        this.remainingAnnualLeaveDays -= usingAnnual;
     }
 
 }

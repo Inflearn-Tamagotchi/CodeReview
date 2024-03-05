@@ -21,12 +21,18 @@ public class Team {
 
     private String manager = null;
 
+    private Integer teamAnnualLeaveDays = 1; // 몇일전에 신청해야하는 지 나타내는 일수
+
     @Builder
     public Team(Long teamId, String teamName) {
         this.teamId = teamId;
         this.teamName = teamName;
         this.employeeCount = 0L; // new team을 했을 때 0이여야하기 때문에
         this.manager = "no manager";
+    }
+
+    public Team(Integer teamAnnualLeaveDays){
+        this.teamAnnualLeaveDays = teamAnnualLeaveDays;
     }
 
     /**
@@ -43,5 +49,9 @@ public class Team {
      */
     public void isManager(String name){
         this.manager = name;
+    }
+
+    public void Team(Integer teamAnnualLeaveDays){
+        this.teamAnnualLeaveDays = teamAnnualLeaveDays;
     }
 }

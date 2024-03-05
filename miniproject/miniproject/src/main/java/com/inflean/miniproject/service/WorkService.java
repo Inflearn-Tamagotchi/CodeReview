@@ -56,7 +56,7 @@ public class WorkService {
 
         for (Work work : workList){
             log.info(work.toString());
-             /* 매개변수 selectDate과 해당되는 회원 id의
+            /* 매개변수 selectDate과 해당되는 회원 id의
             날짜가 일치하는 지 확인하는 조건문 */
             if(formatMonthTime(work.getWorkStartTime()).equals(selectDate)){
 
