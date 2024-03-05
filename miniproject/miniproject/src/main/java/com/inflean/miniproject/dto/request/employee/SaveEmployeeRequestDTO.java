@@ -2,8 +2,10 @@ package com.inflean.miniproject.dto.request.employee;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class SaveEmployeeRequestDTO {
     private String name;
     private String role;

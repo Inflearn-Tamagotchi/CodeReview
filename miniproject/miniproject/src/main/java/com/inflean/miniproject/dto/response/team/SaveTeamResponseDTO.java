@@ -2,8 +2,10 @@ package com.inflean.miniproject.dto.response.team;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class SaveTeamResponseDTO {
 
     private String name;

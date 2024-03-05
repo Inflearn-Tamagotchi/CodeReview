@@ -39,17 +39,6 @@ public class Work {
         this.workEndTime = workEndTime;
     }
 
-    /**
-     * 현재 객체의 workStartTime 와 workEndTime 을 빼서
-     * 분단위로 converting 후 반환하는 메소드
-     * @return Long타입의 분단위 숫자반환
-     */
-    public Long startTimeMinusEndTime(){
-        LocalDateTime start = LocalDateTime.parse(workStartTime);
-        LocalDateTime end = LocalDateTime.parse(workEndTime);
-        return Duration.between(start, end).toMinutes();
-    }
-
     @Builder
     public Work(Long workId, State state, String workStartTime, String workEndTime, Employee employee) {
         this.workId = workId;

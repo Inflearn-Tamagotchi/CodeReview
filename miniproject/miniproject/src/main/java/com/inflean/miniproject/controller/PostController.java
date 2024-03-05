@@ -2,9 +2,12 @@ package com.inflean.miniproject.controller;
 
 import com.inflean.miniproject.entity.Employee;
 import com.inflean.miniproject.entity.Team;
+import com.inflean.miniproject.entity.Work;
 import com.inflean.miniproject.enums.Role;
+import com.inflean.miniproject.enums.State;
 import com.inflean.miniproject.repository.EmployeeRepository;
 import com.inflean.miniproject.repository.TeamRepository;
+import com.inflean.miniproject.repository.WorkRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +23,7 @@ public class PostController {
 
     private final TeamRepository teamRepository;
     private final EmployeeRepository employeeRepository;
+    private final WorkRepository workRepository;
 
     @PostConstruct
     public void saveTeamAndSaveEmployee() {
@@ -55,6 +59,20 @@ public class PostController {
             teamRepository.save(employee.getTeam());
             employeeRepository.save(employee);
         }
+
+        for (int i = 10; i<30; i++){
+            Work work = Work.builder()
+                    .state(State.TO_WORK)
+                    .workStartTime(String.format("2024-03-%d 09:00", i))
+                    .employee(employeeRepository.getReferenceById(1L))
+                    .build();
+            workRepository.save(work);
+
+            // 업데이트 메소드
+            work.updateWork(State.OFF_WORK,  String.format("2024-03-%d 18:00", i));
+            workRepository.save(work);
+        }
+
     }
 
     public String format(LocalDateTime dateTime) {
