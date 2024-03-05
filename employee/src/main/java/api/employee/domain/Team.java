@@ -32,8 +32,14 @@ public class Team {
         this.name = name;
     }
 
-    public void changeManager(String managerName) {
+    public void signManager(String managerName) {
         this.manager = managerName;
+    }
+
+    public void resignManager(String managerName) {
+        if (this.manager.equals(managerName)) {
+            this.manager = null;
+        }
     }
 
     public void changeLeavePolicy(Integer leavePolicy) {

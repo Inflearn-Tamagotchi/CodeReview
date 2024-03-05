@@ -2,6 +2,7 @@ package api.employee.domain;
 
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
@@ -10,6 +11,7 @@ import java.time.temporal.ChronoUnit;
 /**
  * 근무 시간을 분(Minute)단위로 표기하는 Value Type Class
  */
+@Getter
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WorkTime {

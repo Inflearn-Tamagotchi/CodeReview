@@ -2,11 +2,11 @@ package api.employee.visitor;
 
 import api.employee.domain.attendanceRecordType.LeaveRecord;
 import api.employee.domain.attendanceRecordType.WorkRecord;
-import api.employee.model.WorkRecordResponse;
+import api.employee.model.workRecordResponse.Detail;
 
 public interface Visitor {
 
-    WorkRecordResponse.Detail visitWorkRecord(WorkRecord workRecord);
-    WorkRecordResponse.Detail visitLeaveRecord(LeaveRecord leaveRecord);
+    Detail visitWorkRecord(WorkRecord workRecord);
+    Detail visitLeaveRecord(LeaveRecord leaveRecord);
 
 }

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.util.Assert;
 
 import java.time.LocalDate;
 
@@ -86,7 +85,7 @@ public class Member {
 
     // ==== 변경자 ==== //
     public void changeTeam(Team team) {
-        reSignTeam();
+        resignTeam();
         signTeam(team);
     }
 
@@ -95,7 +94,7 @@ public class Member {
         this.team.increaseMemberCount();
     }
 
-    public void reSignTeam() {
+    public void resignTeam() {
         if (this.team != null) {
             this.team.decreaseMemberCount();
         }
@@ -108,13 +107,6 @@ public class Member {
             return;
         }
         this.role = role; // 역할 부여
-
-        // 변경되는 역할이 멤버면 팀의 매니저를 null로 변경
-        boolean roleCondition = this.role == Role.MEMBER;
-        boolean nameCondition = this.team.getManager().equals(this.name);
-        if (roleCondition && nameCondition) {
-            this.team.changeManager(null);
-        }
     }
 
     public void changeName(String name) {
@@ -140,10 +132,5 @@ public class Member {
 
     public boolean hasTeam() {
         return this.team != null;
-    }
-
-    public void registerManager() {
-        Assert.isTrue(this.role == Role.MANAGER, "The role must be MANAGER.");
-        team.changeManager(this.name);
     }
 }

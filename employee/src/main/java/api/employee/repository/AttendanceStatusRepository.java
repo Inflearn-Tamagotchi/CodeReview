@@ -2,6 +2,7 @@ package api.employee.repository;
 
 import api.employee.domain.AttendanceStatus;
 import api.employee.domain.attendanceRecordType.WorkRecord;
+import api.employee.model.MemberWorkTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,4 +30,10 @@ public interface AttendanceStatusRepository extends JpaRepository<AttendanceStat
             "order by a.attendanceDate ASC")
     Optional<List<AttendanceStatus>> findAllRecordByMember(@Param(value = "memberId") Long memberId,
                                                            @Param(value = "month") int month);
+
+    @Query("select new api.employee.model.MemberWorkTime(m.id, m.name, SUM(w.workTime.workTime))" +
+            " from WorkRecord w " +
+            " join w.member m " +
+            "group by m.id, m.name ")
+    List<MemberWorkTime> findAllMemberWorkTime();
 }

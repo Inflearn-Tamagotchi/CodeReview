@@ -3,12 +3,19 @@ package api.employee.service;
 import api.employee.domain.AttendanceStatus;
 import api.employee.domain.Member;
 import api.employee.domain.Team;
-import api.employee.model.WorkRecordResponse;
+import api.employee.domain.WorkTime;
+import api.employee.domain.attendanceRecordType.WorkRecord;
+import api.employee.integration.externalApi.RestDayCalculator;
+import api.employee.model.MemberWorkTime;
+import api.employee.model.workRecordResponse.Detail;
+import api.employee.model.workRecordResponse.WorkRecordResponse;
+import api.employee.repository.AttendanceStatusRepository;
 import api.employee.service.domain.MemberService;
 import api.employee.service.domain.AttendanceStatusService;
 import api.employee.visitor.AttendanceVisitor;
 import api.employee.visitor.Visitor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +24,12 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 직원의 근무 상태와 관련된 정보를 관리합니다.
  */
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -28,6 +37,9 @@ public class AttendanceManageService {
 
     private final MemberService memberService;
     private final AttendanceStatusService attendanceStatusService;
+    private final RestDayCalculator restDayCalculator;
+
+    private final AttendanceStatusRepository attendanceStatusRepository;
 
     /**
      * 직원의 출근 시간을 기록합니다.
@@ -51,7 +63,7 @@ public class AttendanceManageService {
         List<AttendanceStatus> attendanceStatusList = attendanceStatusService.findAllAttendanceStatus(memberId, month);
 
         // Visitor 패턴
-        List<WorkRecordResponse.Detail> detail = new ArrayList<>();
+        List<Detail> detail = new ArrayList<>();
         Visitor visitor = new AttendanceVisitor();
         // attendanceStatusList 순회하며 Element 별로 로직 처리
         for (AttendanceStatus attendanceStatus : attendanceStatusList) {
@@ -81,5 +93,23 @@ public class AttendanceManageService {
         }
         member.usingLeave(); // 연차 사용
         attendanceStatusService.recordLeave(member, requestLeaveDay, reason); // 연차 기록
+    }
+
+    /**
+     * 요청 달의 초과근무 기준을 확인한 뒤, 
+     * 모든 직원의 근무 시간과 비교하여 각 직원별 초과근무 시간을 반환합니다.
+     * @param year 요청 년도
+     * @param month 요청 달
+     * @return 모든 직원의 초과 근무 시간(분)
+     */
+    public List<MemberWorkTime> getMembersOverTime(Integer year, Integer month) {
+        // 요청 달의 초과근무 기준 파악
+        Long overTimeStandard = restDayCalculator.getOverTimeStandard(year, month);
+        WorkTime overTime = WorkTime.minute(overTimeStandard);
+        log.info("overTimeMinuet = {}", overTimeStandard);
+
+        // Stream으로 순회하며 초과근무 기준과 직원의 총 근무 시간을 비교한 뒤, 초과근무 시간을 반환
+        return attendanceStatusRepository.findAllMemberWorkTime().stream()
+                .toList();
     }
 }

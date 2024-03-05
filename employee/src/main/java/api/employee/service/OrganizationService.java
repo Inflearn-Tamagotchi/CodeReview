@@ -100,8 +100,9 @@ public class OrganizationService {
         // 팀에 기존의 매니저가 있으면 기존 매니저 멤버로 변경
         if (team.hasManager()) {
             Member currentManager = memberService.findOneMember(team.getManager());
+            team.resignManager(currentManager.getName());
             currentManager.changeRole(Role.MEMBER);
         }
-        member.registerManager();
+        team.signManager(member.getName());
     }
 }

@@ -4,6 +4,7 @@ import api.employee.domain.AttendanceStatus;
 import api.employee.domain.Member;
 import api.employee.domain.attendanceRecordType.LeaveRecord;
 import api.employee.domain.attendanceRecordType.WorkRecord;
+import api.employee.model.MemberWorkTime;
 import api.employee.repository.AttendanceStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -14,3 +14,5 @@ spring:
 
 logging.level:
   org.hibernate.SQL: debug
+
+restDay.serviceKey: "YE2mX8ly8vkTrh60IOcFkozbEWYKEEryEk7aZtWaRUliIzBPjap0KDOilHEiuufPtgNLe+/WtQ53JZ2doxIHZA=="

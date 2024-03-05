@@ -4,7 +4,7 @@ package api.employee.domain.attendanceRecordType;
 import api.employee.domain.AttendanceStatus;
 import api.employee.domain.Member;
 import api.employee.domain.WorkTime;
-import api.employee.model.WorkRecordResponse;
+import api.employee.model.workRecordResponse.Detail;
 import api.employee.visitor.Visitor;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Embedded;
@@ -54,7 +54,7 @@ public class WorkRecord extends AttendanceStatus {
 
     // ===== Visitor ==== //
     @Override
-    public WorkRecordResponse.Detail accept(Visitor visitor) {
+    public Detail accept(Visitor visitor) {
         return visitor.visitWorkRecord(this);
     }
 }

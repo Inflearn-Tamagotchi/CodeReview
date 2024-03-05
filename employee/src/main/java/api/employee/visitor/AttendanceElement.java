@@ -1,9 +1,9 @@
 package api.employee.visitor;
 
-import api.employee.model.WorkRecordResponse;
+import api.employee.model.workRecordResponse.Detail;
 
 public interface AttendanceElement {
 
-    WorkRecordResponse.Detail accept(Visitor visitor);
+    Detail accept(Visitor visitor);
 
 }
