@@ -35,3 +35,11 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### custom ignore ###
+application.yml
+build.gradle
+gradlew
+gradlew.bat
+settings.gradle
+generated
