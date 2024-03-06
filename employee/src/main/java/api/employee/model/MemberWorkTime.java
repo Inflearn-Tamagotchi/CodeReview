@@ -23,6 +23,7 @@ public class MemberWorkTime {
             workTimeMinute = workTimeMinute - overTime.getWorkingMinute();
         } else {
             workTimeMinute = 0L;
+            System.out.println("workTimeMinute = " + workTimeMinute);
         }
         return this;
     }

@@ -110,6 +110,7 @@ public class AttendanceManageService {
 
         // Stream으로 순회하며 초과근무 기준과 직원의 총 근무 시간을 비교한 뒤, 초과근무 시간을 반환
         return attendanceStatusRepository.findAllMemberWorkTime().stream()
+                .map(memberWorkTime -> memberWorkTime.calculateOverTime(overTime))
                 .toList();
     }
 }

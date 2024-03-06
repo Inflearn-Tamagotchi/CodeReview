@@ -17,7 +17,7 @@ public class WorkRecordController {
 
     @GetMapping("/member/{memberId}/attendance-records")
     public WorkRecordResponse findMemberAttendanceRecord(@PathVariable(value = "memberId") Long memberId,
-                                                      @RequestParam(name = "month") int month) {
+                                                         @RequestParam(name = "month") int month) {
         return attendanceManageService.memberMonthAttendanceRecord(memberId, month);
     }
 
