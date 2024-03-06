@@ -1,8 +1,11 @@
 package com.inflean.miniproject.service;
 
 import com.inflean.miniproject.dto.response.work.WorkTimeByDateResponseDTO;
+import com.inflean.miniproject.entity.Employee;
+import com.inflean.miniproject.entity.EmployeeAnnualLeave;
 import com.inflean.miniproject.entity.Work;
 import com.inflean.miniproject.enums.State;
+import com.inflean.miniproject.repository.EmployeeAnnualLeaveRepository;
 import com.inflean.miniproject.repository.EmployeeRepository;
 import com.inflean.miniproject.repository.WorkRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,11 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -25,6 +27,7 @@ public class WorkService {
 
     private final WorkRepository workRepository;
     private final EmployeeRepository employeeRepository;
+    private final EmployeeAnnualLeaveRepository employeeAnnualLeaveRepository;
 
     @Transactional
     public void toWork(Long employeeId){
@@ -55,23 +58,45 @@ public class WorkService {
         WorkTimeByDateResponseDTO dto = new WorkTimeByDateResponseDTO();
 
         for (Work work : workList){
-            log.info(work.toString());
-            /* 매개변수 selectDate과 해당되는 회원 id의
+
+            /* 매개변수 selectDate 와 해당되는 회원 id의
             날짜가 일치하는 지 확인하는 조건문 */
-            if(formatMonthTime(work.getWorkStartTime()).equals(selectDate)){
+            if(formatMonth(work.getWorkStartTime()).equals(selectDate)){
 
                 // wokingTime, date 세팅해주기
                 Long workingMinutes = startTimeMinusEndTime(work.getWorkStartTime(), work.getWorkEndTime());
-                String date = formatDayMonthTime(work.getWorkStartTime());
+                String date = formatDayMonth(work.getWorkStartTime());
 
                 WorkTimeByDateResponseDTO.Detail detail = new WorkTimeByDateResponseDTO.Detail();
-                // addDetails 를 통해 반환할 객체의 details 리스트에 detail 을 add 해준다.
-                detail.setDate(date);
-                detail.setWorkingMinutes(workingMinutes);
-                dto.addDetails(detail);
 
-                // sum을 해주는 메소드사용
-                dto.isSum(workingMinutes);
+                // 남은 연차일수 select
+                Employee employee = employeeRepository.findById(employeeId)
+                        .orElseThrow(() -> new IllegalArgumentException("잘못된 직원 ID가 입력되었습니다."));
+
+                EmployeeAnnualLeave employeeAnnualLeave = employeeAnnualLeaveRepository.findByEmployee(employee);
+
+                LocalDate workDate = formatLocalDate(work.getWorkStartTime()); // 출근일
+                LocalDate startAnnual = formatLocalDate(employeeAnnualLeave.getStartAnnualLeaveDay()); // 연차시작일
+                LocalDate endAnnual = formatLocalDate(employeeAnnualLeave.getEndAnnualLeaveDay()); // 연차끝일
+
+                if(isWithinRange(workDate, startAnnual, endAnnual)){
+                    // addDetails 를 통해 반환할 객체의 details 리스트에 detail 을 add 해준다.
+                    detail.setUsingDayOff(false);
+                    detail.setWorkingMinutes(0L);
+                    dto.addDetails(detail);
+
+                    // sum을 해주는 메소드사용
+                    dto.isSum(0L);
+                }else{
+                    // addDetails 를 통해 반환할 객체의 details 리스트에 detail 을 add 해준다.
+                    detail.setUsingDayOff(true);
+                    detail.setWorkingMinutes(workingMinutes);
+                    dto.addDetails(detail);
+
+                    // sum을 해주는 메소드사용
+                    dto.isSum(workingMinutes);
+                }
+                detail.setDate(date);
             }
         }
 
@@ -87,14 +112,14 @@ public class WorkService {
 
     /* 연월일시분초를 연월로 변환해주는 메소드
        ex) 2024-03-04 12:00 -> 2024-03 */
-    public String formatMonthTime(String entityTime) {
+    public String formatMonth(String entityTime) {
         entityTime = entityTime.substring(0, 7);
         return entityTime;
     }
 
     /* 연월일시분을 연월일로 변환해주는 메소드
        ex) */
-    public String formatDayMonthTime(String time){
+    public String formatDayMonth(String time){
         return time.split(" ")[0];
     }
 
@@ -109,5 +134,15 @@ public class WorkService {
         LocalDateTime start = LocalDateTime.parse(workStartTime, formatter);
         LocalDateTime end = LocalDateTime.parse(workEndTime, formatter);
         return Duration.between(start, end).toMinutes();
+    }
+
+    public LocalDate formatLocalDate(String startDate){
+        startDate = startDate.toString().substring(0, 10);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return LocalDate.parse(startDate, formatter);
+    }
+
+    public static boolean isWithinRange(LocalDate date, LocalDate start, LocalDate end) {
+        return !date.isBefore(start) && !date.isAfter(end);
     }
 }

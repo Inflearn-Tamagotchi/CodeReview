@@ -3,10 +3,9 @@ package com.inflean.miniproject.controller;
 import com.inflean.miniproject.dto.request.annualLeave.AnnualLeaveRequestDTO;
 import com.inflean.miniproject.service.EmployeeAnnualLeaveService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/employeeAnnualLeave")
@@ -18,6 +17,11 @@ public class EmployeeAnnualLeaveController {
     @PostMapping("/requestAnnualLeave")
     public void requestAnnualLeave(@RequestBody AnnualLeaveRequestDTO request){
         employeeAnnualLeaveService.requestAnnualLeave(request);
+    }
+
+    @GetMapping("/selectAnnualLeave/{employeeId}")
+    public Map<String, Object> selectAnnualLeave(@PathVariable("employeeId") Long employeeId){
+        return employeeAnnualLeaveService.selectAnnualLeave(employeeId);
     }
 
 }

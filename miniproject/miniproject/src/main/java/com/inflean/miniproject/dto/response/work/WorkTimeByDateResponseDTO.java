@@ -14,6 +14,12 @@ public class WorkTimeByDateResponseDTO {
     public static class Detail{
         private String date;
         private Long workingMinutes;
+        private boolean usingDayOff = false;
+
+        public void usingDayOff(boolean usingDayOff){
+            this.usingDayOff = usingDayOff;
+        }
+
     }
 
 
@@ -34,4 +40,6 @@ public class WorkTimeByDateResponseDTO {
     public void isSum(Long workingMinutes){
         this.sum += workingMinutes;
     }
+
+
 }

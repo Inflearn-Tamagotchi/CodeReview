@@ -10,9 +10,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -22,8 +23,11 @@ public class EmployeeAnnualLeaveService {
 
     private final EmployeeAnnualLeaveRepository employeeAnnualLeaveRepository;
     private final EmployeeRepository employeeRepository;
-    private final TeamRepository teamRepository;
 
+    /**
+     * 연차신청
+     * @param request
+     */
     @Transactional
     public void requestAnnualLeave(AnnualLeaveRequestDTO request){
         EmployeeAnnualLeave employeeAnnualLeave = EmployeeAnnualLeave.builder()
@@ -52,6 +56,22 @@ public class EmployeeAnnualLeaveService {
             throw new IllegalArgumentException(String.format("신청일은 %s 이후여야합니다.", teamRequestDay));
         }
     }
+
+    /**
+     * 연차조회
+     * @param employeeId
+     * @return
+     */
+    public Map<String, Object> selectAnnualLeave(Long employeeId){
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("직원 아이디를 확인해주세요(입력값 : %d)", employeeId)));
+
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("annualLeave", employee.getRemainingAnnualLeaveDays());
+        return response;
+    }
+
 
     // 편의메소드
     public Integer getTeamDay(Long employeeId){
